@@ -26,7 +26,7 @@ void *naive_malloc(size_t size)
 	++call_nb;
 	printf("call_nb: %lu\n", call_nb);
 	*(size_t *)prev_brk = align(size) + sizeof(size_t);
-	return ((char *)prev_brk + align(size));
+	return ((char *)prev_brk + sizeof(size_t));
 }
 
 int main(void)
