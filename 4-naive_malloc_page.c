@@ -36,7 +36,13 @@ void *expand(size_t size)
 		/* Calling expand() for the first time */
 		heap.heap_start = p;
 		heap.heap_end = heap.heap_start + page_size;
+
+		add_header(p, size, prev);
+		add_header(p + size + HEADER_SIZE, page_size - size - 3 * HEADER_SIZE, 0);
+		add_header(p + page_size - HEADER_SIZE, 0, page_size - size - 2 * HEADER_SIZE);
+		return (p);
 	}
+
 	else
 	{
 		/*
@@ -46,13 +52,13 @@ void *expand(size_t size)
 		p -= HEADER_SIZE;
 		prev = GET_PREV(p);
 		heap.heap_end += page_size;
-	}
-	/* Changing 3 headers */
-	add_header(p, size, prev);
-	add_header(p + size + HEADER_SIZE, page_size - size - 3 * HEADER_SIZE, 0);
-	add_header(p + page_size - HEADER_SIZE, 0, page_size - size - 2 * HEADER_SIZE);
 
-	return (p);
+		add_header(p, size, prev);
+		p += HEADER_SIZE;
+		add_header(p + size, page_size - size - 2 * HEADER_SIZE, 0);
+		add_header(p + page_size - HEADER_SIZE, 0, page_size - size - HEADER_SIZE);
+		return (p - HEADER_SIZE);
+	}
 }
 
 void *find_block(size_t size)
