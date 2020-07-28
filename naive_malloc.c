@@ -5,6 +5,8 @@ void *find_unused(char *start_addr, size_t call_nb, size_t *excess_mem)
 	while (call_nb > 0)
 	{
 		*excess_mem -= *(size_t *)start_addr;
+		if (*excess_mem == 0)
+			*excess_mem = sysconf(_SC_PAGESIZE);
 		start_addr += *(size_t *)start_addr;
 		--call_nb;
 	}
@@ -45,7 +47,7 @@ void *naive_malloc(size_t size)
 	if (excess_mem < size + sizeof(size_t))
 	{
 		puts("CALLED");
-		excess_mem = sysconf(_SC_PAGESIZE) - size + sizeof(size_t);
+		excess_mem = sysconf(_SC_PAGESIZE) - (size + sizeof(size_t));
 		prev_brk = sbrk(sysconf(_SC_PAGESIZE));
 		if (prev_brk == (void *) -1)
 			return (NULL);
