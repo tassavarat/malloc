@@ -41,10 +41,11 @@ void *naive_malloc(size_t size)
 	}
 	excess_mem -= size + sizeof(size_t);
 	printf("excess_mem: %lu\n", excess_mem);
-	if (excess_mem - size + sizeof(size_t) < size + sizeof(size_t))
+	/* if (excess_mem - size + sizeof(size_t) < size + sizeof(size_t)) */
+	if (excess_mem < size + sizeof(size_t))
 	{
-		/* puts("CALLED"); */
-		excess_mem = sysconf(_SC_PAGESIZE);
+		puts("CALLED");
+		excess_mem = sysconf(_SC_PAGESIZE) - size + sizeof(size_t);
 		prev_brk = sbrk(sysconf(_SC_PAGESIZE));
 		if (prev_brk == (void *) -1)
 			return (NULL);
@@ -52,7 +53,7 @@ void *naive_malloc(size_t size)
 	/* *(size_t *)prev_brk = align(size) + sizeof(size_t); */
 	*(size_t *)prev_brk = size + sizeof(size_t);
 	/* excess_mem -= *(size_t *)prev_brk; */
-	/* printf("excess_mem: %lu\n", excess_mem); */
+	printf("excess_mem: %lu\n", excess_mem);
 	/* printf("target: %lu\n", *(size_t *)prev_brk); */
 	*(size_t *)((char *)prev_brk + *(size_t *)prev_brk) = excess_mem;
 	++call_nb;
