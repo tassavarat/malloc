@@ -6,7 +6,7 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 	/* printf("excess_mem: %lu\n", *excess_mem); */
 	*(size_t *)chunk = 0;
 	*(size_t *)(chunk + sizeof(size_t)) = chunk_size;
-	*(size_t *)((char *)chunk + *(size_t *)chunk) = chunk_size;
+	*(size_t *)(chunk + *(size_t *)chunk) = chunk_size;
 	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = *excess_mem;
 }
 
