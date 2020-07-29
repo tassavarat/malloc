@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 #include "ANSI-color-codes.h"
 
 #define ALIGNMENT sizeof(void *)
@@ -50,6 +51,7 @@ void print_heap(void);
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
 void _free(void *ptr);
+void *_calloc(size_t nmemb, size_t size);
 
 void *malloc(size_t size);
 void free(void *ptr);
