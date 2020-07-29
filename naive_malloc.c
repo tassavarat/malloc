@@ -6,7 +6,7 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 	/* printf("excess_mem: %lu\n", *excess_mem); */
 	*(size_t *)chunk = 0;
 	*(size_t *)(chunk + sizeof(size_t)) = chunk_size;
-	*(size_t *)(chunk + *(size_t *)chunk) = chunk_size;
+	*(size_t *)(chunk + *(size_t *)chunk) = 0;
 	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = *excess_mem;
 }
 
@@ -87,10 +87,10 @@ int main(void)
 		strcpy(str, "Holberton");
 		str[21] = '\0';
 		printf("%p: %s, ", (void *)str, str);
-		/* chunk = (void *)(str - sizeof(size_t)); */
-		chunk = (void *)(str - 2 * sizeof(size_t));
+		chunk = (void *)(str - sizeof(size_t));
 		printf("chunk addr: %p, ", (void *)chunk);
-		printf("size: %lu, ", *((size_t *)chunk));
+		printf("prev size: %lu, ", *((size_t *)((char *)chunk - sizeof(size_t))));
+		printf("cur size: %lu, ", *((size_t *)chunk));
 		printf("break: %p\n", sbrk(0));
 	}
 
