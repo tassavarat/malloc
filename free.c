@@ -13,6 +13,6 @@ void _free(void *ptr)
 	p = ptr;
 	p -= HEADER_SIZE;
 	next = p + GET_SIZE(p);
-	((block_info *)next)->prev = GET_SIZE(p) ;
+	((block_info *)next)->prev = GET_SIZE(p);
 	((block_info *)next)->size |= 1;
 }
