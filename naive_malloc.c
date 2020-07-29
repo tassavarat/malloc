@@ -28,8 +28,7 @@ void *naive_malloc(size_t size)
 	chunk_size = size + sizeof(size_t);
 	if (!start_addr)
 	{
-		puts("SBRK");
-		prev_brk = sbrk(_SC_PAGESIZE);
+		prev_brk = sbrk(sysconf(_SC_PAGESIZE));
 		if (prev_brk == (void *) -1)
 			return (NULL);
 		start_addr = prev_brk;
@@ -42,8 +41,7 @@ void *naive_malloc(size_t size)
 	}
 	if (excess_mem < chunk_size + sizeof(size_t))
 	{
-		puts("SBRK");
-		if (sbrk(_SC_PAGESIZE) == (void *) -1)
+		if (sbrk(sysconf(_SC_PAGESIZE)) == (void *) -1)
 			return (NULL);
 		excess_mem += sysconf(_SC_PAGESIZE);
 	}
