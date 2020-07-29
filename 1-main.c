@@ -7,8 +7,10 @@
 
 void *_malloc(size_t size);
 
-#define LOWER 10
-#define UPPER 10000
+#define LOWER 1
+#define UPPER 1000000000000
+#define ITERATIONS 100
+
 /**
  * main - Program entry point
  *
@@ -18,22 +20,25 @@ int main(void)
 {
 	char *str;
 	int i;
+	size_t s;
 
 	setbuf(stdout, NULL);
 	printf("Starting break is %p\n", sbrk(0));
 	srand(time(0));
-	for (i = 0; i < 100; i++)
+	for (i = 0; i < ITERATIONS; i++)
 	{
-		void *chunk;
+		/* void *chunk; */
 
-		str = _malloc(LOWER + (rand() % (UPPER - LOWER + 1)));
+		s = LOWER + (rand() % (UPPER - LOWER + 1));
+		printf("%lu\n", s);
+		str = _malloc(s);
 		strcpy(str, "Holberton");
 		str[21] = '\0';
-		printf("%p: %s, ", (void *)str, str);
-		chunk = (void *)(str - sizeof(size_t));
-		printf("chunk addr: %p, ", (void *)chunk);
-		printf("size: %lu, ", *((size_t *)chunk));
-		printf("break: %p\n", sbrk(0));
+		/* printf("%p: %s, ", (void *)str, str); */
+		/* chunk = (void *)(str - sizeof(size_t)); */
+		/* printf("chunk addr: %p, ", (void *)chunk); */
+		/* printf("size: %lu, ", *((size_t *)chunk)); */
+		/* printf("break: %p\n", sbrk(0)); */
 	}
 
 	printf("Final break is %p\n", sbrk(0));

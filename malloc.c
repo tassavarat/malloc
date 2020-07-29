@@ -25,9 +25,14 @@ void print_heap(void)
 	       RED, GET_SIZE(p), reset);
 
 	if (p + HEADER_SIZE != sbrk(0))
+	{
 		printf("%s\t\tChunk end and Heap end do not match!!!%s\n", BRED, reset);
+		exit(1);
+	}
 	else
+	{
 		printf("%s\t\tChunk end is good!!!%s\n", BGRN, reset);
+	}
 }
 
 /**
