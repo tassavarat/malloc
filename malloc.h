@@ -15,6 +15,7 @@
 #define align_up(num, align) (((num) + ((align) - 1)) & ~((align) - 1))
 
 /* Macros to get struct members */
+#define LSB_ZERO_MASK 0xfffffffffffffffe
 #define GET_SIZE(p) (((block_info *)(p))->size)
 #define GET_PREV(p) (((block_info *)(p))->prev)
 

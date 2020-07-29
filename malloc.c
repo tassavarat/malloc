@@ -79,7 +79,6 @@ void *expand(size_t size)
 			   page_size - size - 2 * HEADER_SIZE);
 		return (p);
 	}
-
 	else
 	{
 		/*
@@ -94,7 +93,8 @@ void *expand(size_t size)
 		add_header(p, size, GET_PREV(p) & 0xfffffffffffffffe);
 		p += GET_SIZE(p) & 1 ? GET_SIZE(p) - 1 : GET_SIZE(p);
 		add_header(p, page_size - size - 2 * HEADER_SIZE, 0);
-		add_header(p + (GET_SIZE(p) & 0xfffffffffffffffe), 0, page_size - size - HEADER_SIZE);
+		add_header(p + (GET_SIZE(p) & 0xfffffffffffffffe), 0,
+			   page_size - size - HEADER_SIZE);
 		return (tmp);
 	}
 }
@@ -121,14 +121,15 @@ void *find_block(size_t size)
 			if (GET_SIZE(tmp) >= required_size + HEADER_SIZE + MIN_SIZE)
 			{
 				/* Split the chunk */
-
 				/* middle = tmp + required_size; */
 				/* ((block_info *)middle)->size = GET_SIZE(tmp) - required_size; */
 				/* ((block_info *)middle)->prev = 0; */
 				add_header(tmp + required_size,
-					   (GET_SIZE(tmp) & 0xfffffffffffffffe) - required_size - HEADER_SIZE, 0);
+					   (GET_SIZE(tmp) & 0xfffffffffffffffe)
+					   - required_size - HEADER_SIZE, 0);
 				((block_info *)tmp)->size = required_size;
-				((block_info *)p)->prev = GET_SIZE(tmp + required_size) & 0xfffffffffffffffe;
+				((block_info *)p)->prev = GET_SIZE(tmp + required_size)
+					& 0xfffffffffffffffe;
 			}
 			else
 			{
