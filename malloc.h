@@ -16,8 +16,13 @@
 
 /* Macros to get struct members */
 #define LSB_ZERO_MASK 0xfffffffffffffffe
-#define GET_SIZE(p) (((block_info *)(p))->size)
-#define GET_PREV(p) (((block_info *)(p))->prev)
+/* Get Size and Prev */
+#define _GET_SIZE(p) (((block_info *)(p))->size)
+#define _GET_PREV(p) (((block_info *)(p))->prev)
+
+/* Get Size and Prev with unset LSB*/
+#define GET_SIZE(p) ((((block_info *)(p))->size) & LSB_ZERO_MASK)
+#define GET_PREV(p) ((((block_info *)(p))->prev) & LSB_ZERO_MASK)
 
 /**
  * struct heap_info_s - stores info about heap

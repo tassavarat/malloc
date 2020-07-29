@@ -12,17 +12,17 @@ void print_heap(void)
 
 	if (!p)
 		return;
-	while (GET_SIZE(p) >= 18)
+	while (GET_SIZE(p) >= HEADER_SIZE + MIN_SIZE)
 	{
 		printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
 		printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, GET_PREV(p),
-		       RED, GET_SIZE(p), reset);
-		p += GET_SIZE(p) & 1 ? GET_SIZE(p) - 1 : GET_SIZE(p);
+		       RED, _GET_SIZE(p), reset);
+		p += GET_SIZE(p);
 		++i;
 	}
 	printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
-	printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, GET_PREV(p),
-	       RED, GET_SIZE(p), reset);
+	printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, _GET_PREV(p),
+	       RED, _GET_SIZE(p), reset);
 
 	if (p + HEADER_SIZE != sbrk(0))
 	{
@@ -90,11 +90,10 @@ void *expand(size_t size)
 		p -= HEADER_SIZE;
 		tmp = p;
 		/* Change previous sentinel chunk, returned to USER */
-		add_header(p, size, GET_PREV(p) & 0xfffffffffffffffe);
-		p += GET_SIZE(p) & 1 ? GET_SIZE(p) - 1 : GET_SIZE(p);
+		add_header(p, size, GET_PREV(p));
+		p += GET_SIZE(p);
 		add_header(p, page_size - size - 2 * HEADER_SIZE, 0);
-		add_header(p + (GET_SIZE(p) & 0xfffffffffffffffe), 0,
-			   page_size - size - HEADER_SIZE);
+		add_header(p + GET_SIZE(p), 0, page_size - size - HEADER_SIZE);
 		return (tmp);
 	}
 }
@@ -114,10 +113,10 @@ void *find_block(size_t size)
 
 	while (GET_SIZE(p) >= HEADER_SIZE + MIN_SIZE)
 	{
-		p += GET_SIZE(p) & 1 ? GET_SIZE(p) - 1 : GET_SIZE(p);
-		if ((GET_SIZE(p) & 1) && GET_SIZE(p - GET_PREV(p)) >= required_size)
+		p += GET_SIZE(p);
+		if ((_GET_SIZE(p) & 1) && GET_SIZE(p - GET_PREV(p)) >= required_size)
 		{
-			tmp = p - (GET_PREV(p) & 0xfffffffffffffffe);
+			tmp = p - GET_PREV(p);
 			if (GET_SIZE(tmp) >= required_size + HEADER_SIZE + MIN_SIZE)
 			{
 				/* Split the chunk */
@@ -125,18 +124,14 @@ void *find_block(size_t size)
 				/* ((block_info *)middle)->size = GET_SIZE(tmp) - required_size; */
 				/* ((block_info *)middle)->prev = 0; */
 				add_header(tmp + required_size,
-					   (GET_SIZE(tmp) & 0xfffffffffffffffe)
-					   - required_size - HEADER_SIZE, 0);
+					   GET_SIZE(tmp) - required_size - HEADER_SIZE, 0);
 				((block_info *)tmp)->size = required_size;
-				((block_info *)p)->prev = GET_SIZE(tmp + required_size)
-					& 0xfffffffffffffffe;
+				((block_info *)p)->prev = GET_SIZE(tmp + required_size);
 			}
 			else
 			{
 				/* Don't split the chunk */
-				((block_info *)p)->size -= 1;
-				/* ((block_info *)p)->prev = 0; */
-				/* add_header(p, GET_SIZE(p) - 1, 0); */
+				((block_info *)p)->size &= LSB_ZERO_MASK;
 			}
 
 			return (tmp);
