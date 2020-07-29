@@ -133,9 +133,9 @@ void *find_block(size_t size)
 			else
 			{
 				/* Don't split the chunk */
-				/* ((block_info *)p)->size -= 1; */
+				((block_info *)p)->size -= 1;
 				/* ((block_info *)p)->prev = 0; */
-				add_header(p, GET_SIZE(p) - 1, 0);
+				/* add_header(p, GET_SIZE(p) - 1, 0); */
 			}
 
 			return (tmp);
@@ -154,6 +154,7 @@ void *_malloc(size_t size)
 {
 	char *p;
 
+	/* write(1, "My malloc\n", 11); */
 	size = align_up(size, ALIGNMENT);
 
 	if (size == 0)

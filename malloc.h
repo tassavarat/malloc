@@ -43,5 +43,6 @@ typedef struct block_info_s
 void print_heap(void);
 void *naive_malloc(size_t size);
 void *_malloc(size_t size);
+void _free(void *ptr);
 
 #endif /* MALLOC_H */
