@@ -149,12 +149,12 @@ void *find_block(size_t size)
 }
 
 /**
- * _malloc - malloc function implementation
+ * naive_malloc - malloc function implementation
  * @size: size need by a user
  * Return: a pointer to heap with at least @size usable memory,
  * NULL on failure or when @size is 0
  */
-void *_malloc(size_t size)
+void *naive_malloc(size_t size)
 {
 	char *p;
 

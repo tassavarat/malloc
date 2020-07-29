@@ -55,14 +55,6 @@ void *expand(size_t size)
 	size_t page_size;
 	char *p, *tmp;
 
-	/**
-	 * Once we expand we need at least two headers,
-	 * one for the middle chunk and one for the header at the end
-	 * MIN_SIZE is for middle chunk, we don't want our middle
-	 * chunk to have only header. We may need one more header when expand()
-	 * is called for the firs time, otherwise
-	 * reuse sentinel chunk (chunk at the end of heap) by putting new size there
-	 */
 	page_size = 2 * HEADER_SIZE + MIN_SIZE + size;
 	page_size += heap.heap_start ? 0 : HEADER_SIZE;
 	page_size = align_up(page_size, PAGESIZE);
@@ -73,7 +65,6 @@ void *expand(size_t size)
 	{
 		/* Calling expand() for the first time */
 		heap.heap_start = p;
-
 		/* Set the first chunk, returned to USER */
 		add_header(p, size, 0);
 		/* Set middle and sentinel chunks */
