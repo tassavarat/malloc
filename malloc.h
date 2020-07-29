@@ -6,6 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define align(size) ((size + sizeof(size_t) - 1) & ~(sizeof(size_t) - 1))
+#define align(offset, align) ((offset + (align - 1)) & - align)
 
 #endif /* MALLOC_H */
