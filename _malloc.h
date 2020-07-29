@@ -5,12 +5,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "ANSI-color-codes.h"
 
 #define ALIGNMENT sizeof(void *)
 #define MIN_SIZE sizeof(void *)
-#define align_up(num) (((num) + ((ALIGNMENT) - 1)) & ~((ALIGNMENT) - 1))
 #define PAGESIZE sysconf(_SC_PAGESIZE)
 #define HEADER_SIZE sizeof(block_info)
+#define align_up(num) (((num) + ((ALIGNMENT) - 1)) & ~((ALIGNMENT) - 1))
+#define align_pagesize(num) (((num) + ((PAGESIZE) - 1)) & ~((PAGESIZE) - 1))
 
 /* Macros to get struct members */
 #define GET_SIZE(p) (((block_info *)(p))->size)
@@ -28,5 +30,6 @@ typedef struct block_info_s
 	size_t size;
 } block_info;
 
-
+static heap_info heap;
+void print_heap(void);
 #endif /* _MALLOC_H */
