@@ -1,8 +1,8 @@
-#include "_malloc.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "malloc.h"
 
 void *_malloc(size_t size);
 
@@ -30,10 +30,18 @@ int main(void)
 		chunk = (void *)(str - sizeof(size_t));
 		printf("chunk addr: %p, ", (void *)chunk);
 		printf("size: %lu, ", *((size_t *)chunk));
+		str = _malloc(278);
+		strcpy(str, "Holberton");
+		str[21] = '\0';
+		printf("%p: %s, ", (void *)str, str);
+		chunk = (void *)(str - sizeof(size_t));
+		printf("chunk addr: %p, ", (void *)chunk);
+		printf("size: %lu, ", *((size_t *)chunk));
 		printf("break: %p\n", sbrk(0));
 	}
 
 	printf("Final break is %p\n", sbrk(0));
+	print_heap();
 	return (EXIT_SUCCESS);
 }
 

@@ -1,24 +1,26 @@
-#include "_malloc.h"
+#include "malloc.h"
+
+static heap_info heap;
 
 /**
  * print_heap - prints contents of heap, used for visualization
 */
 void print_heap(void)
 {
-	void *p = heap.heap_start, *tmp, *middle;
+	char *p = heap.heap_start;
 	size_t i = 0;
 
 	if (!p)
 		return;
-	while (GET_SIZE(p) >= 18)
+	while (GET_SIZE(p) >= HEADER_SIZE + MIN_SIZE)
 	{
-		printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, p, reset);
+		printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
 		printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, GET_PREV(p),
 		       RED, GET_SIZE(p), reset);
 		p += GET_SIZE(p) & 1 ? GET_SIZE(p) - 1 : GET_SIZE(p);
 		++i;
 	}
-	printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, p, reset);
+	printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
 	printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, GET_PREV(p),
 	       RED, GET_SIZE(p), reset);
 
@@ -51,7 +53,7 @@ void add_header(void *addr, size_t size, size_t prev)
 void *expand(size_t size)
 {
 	size_t page_size;
-	void *p, *tmp;
+	char *p, *tmp;
 
 	/**
 	 * Once we expand we need at least two headers,
@@ -60,8 +62,10 @@ void *expand(size_t size)
 	 * chunk to have only header. We may need one more header when expand()
 	 * is called for the firs time, otherwise
 	 * reuse sentinel chunk (chunk at the end of heap) by putting new size there
-	*/
-	page_size = align_pagesize(page_size);
+	 */
+	page_size = 2 * HEADER_SIZE + MIN_SIZE + size;
+	page_size += heap.heap_start ? 0 : HEADER_SIZE;
+	page_size = align_up(page_size, PAGESIZE);
 	p = sbrk(page_size);
 	if (p == (void *)-1 && errno == ENOMEM)
 		return (NULL);
@@ -106,7 +110,7 @@ void *expand(size_t size)
 */
 void *find_block(size_t size)
 {
-	void *p = heap.heap_start, *tmp;
+	char *p = heap.heap_start, *tmp;
 	size_t required_size = size + HEADER_SIZE;
 
 	if (!p)
@@ -152,8 +156,9 @@ void *find_block(size_t size)
  */
 void *_malloc(size_t size)
 {
-	size = align_up(size);
-	void *p;
+	char *p;
+
+	size = align_up(size, ALIGNMENT);
 
 	if (size == 0)
 		return (NULL);
