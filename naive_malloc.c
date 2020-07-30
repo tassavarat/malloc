@@ -9,7 +9,6 @@
 void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 {
 	*excess_mem -= chunk_size;
-	/* printf("excess_mem: %lu\n", *excess_mem); */
 	*(size_t *)chunk = chunk_size;
 	*(size_t *)(chunk + *(size_t *)chunk) = *excess_mem;
 }
@@ -42,7 +41,6 @@ void *extend(size_t chunk_size, size_t *excess_mem)
 {
 	void *chunk;
 
-	/* puts("sbrk called"); */
 	chunk = sbrk(align(chunk_size, sysconf(_SC_PAGESIZE)));
 	if (chunk == (void *) -1)
 		return (NULL);
@@ -65,9 +63,6 @@ void *naive_malloc(size_t size)
 
 	hdr_size = sizeof(size_t);
 	chunk_size = align(size, sizeof(void *)) + hdr_size;
-	/* printf("call_nb: %lu\n", call_nb); */
-	/* printf("chunk_size: %lu\n", chunk_size); */
-	/* printf("sbrk req: %lu\n", align(chunk_size, sysconf(_SC_PAGESIZE))); */
 	if (!start_addr)
 	{
 		excess_mem = 0;
