@@ -1,5 +1,11 @@
 #include "malloc.h"
 
+/**
+ * set_hdr - set chunk headers
+ * @chunk: pointer to start of chunk
+ * @chunk_size: size of chunk
+ * @excess_mem: pointer to variable tracking excess memory
+ */
 void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 {
 	*excess_mem -= chunk_size;
@@ -8,6 +14,13 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 	*(size_t *)(chunk + *(size_t *)chunk) = *excess_mem;
 }
 
+/**
+ * find_unused - find unused chunk block
+ * @start_addr: pointer to heap start
+ * @call_nb: specifies how many times malloc has been called
+ *
+ * Return: pointer to start of unused chunk
+ */
 void *find_unused(char *start_addr, size_t call_nb)
 {
 	while (call_nb > 0)
@@ -18,6 +31,13 @@ void *find_unused(char *start_addr, size_t call_nb)
 	return (start_addr);
 }
 
+/**
+ * extend - calls sbrk with size aligned to page size
+ * @chunk_size: aligned size request
+ * @excess_mem: pointer to variable tracking excess memory
+ *
+ * Return: pointer to start of new chunk, NULL on failure
+ */
 void *extend(size_t chunk_size, size_t *excess_mem)
 {
 	void *chunk;
@@ -31,7 +51,7 @@ void *extend(size_t chunk_size, size_t *excess_mem)
 }
 
 /**
- * malloc - naive version of malloc: dynamically allocates memory on the heap
+ * naive_malloc - naive malloc: dynamically allocates memory on the heap
  * @size: number of bytes to allocate
  *
  * Return: the memory address newly allocated, or NULL on error
