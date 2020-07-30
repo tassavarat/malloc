@@ -12,25 +12,27 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 	/* printf("excess_mem: %lu\n", *excess_mem); */
 	*(size_t *)chunk = 0;
 	*(size_t *)(chunk + sizeof(size_t)) = chunk_size;
-	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = 0;
+	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = chunk_size;
 	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t)) + sizeof(size_t)) = *excess_mem;
 }
 
 /**
  * find_unused - find unused chunk block
- * @heap_start: pointer to heap start
+ * @chunk: pointer to heap start
  * @call_nb: specifies how many times malloc has been called
  *
  * Return: pointer to start of unused chunk
  */
-void *find_unused(char *heap_start, size_t call_nb)
+void *find_unused(char *chunk)
 {
-	while (call_nb > 0)
-	{
-		heap_start += *(size_t *)(heap_start + sizeof(size_t));
-		--call_nb;
-	}
-	return (heap_start);
+	size_t prev_chunk_size;
+
+	do {
+		prev_chunk_size = *(size_t *)(chunk + sizeof(size_t));
+		chunk += *(size_t *)(chunk + sizeof(size_t));
+	} while (*(size_t *)chunk != prev_chunk_size);
+	*(size_t *)chunk = 0;
+	return (chunk);
 }
 
 /**
@@ -62,7 +64,6 @@ void *malloc(size_t size)
 {
 	void *chunk;
 	static void *heap_start;
-	static size_t call_nb;
 	size_t hdr_size, chunk_size, excess_mem;
 
 	hdr_size = 2 * sizeof(size_t);
@@ -79,7 +80,7 @@ void *malloc(size_t size)
 	}
 	else
 	{
-		chunk = find_unused(heap_start, call_nb);
+		chunk = find_unused(heap_start);
 		excess_mem = *(size_t *)((char *)chunk + sizeof(size_t));
 		/* printf("unused: excess_mem: %lu\n", excess_mem); */
 		if (excess_mem < chunk_size + hdr_size)
@@ -87,7 +88,6 @@ void *malloc(size_t size)
 				return (NULL);
 	}
 	set_hdr(chunk, chunk_size, &excess_mem);
-	++call_nb;
 	return ((char *)chunk + hdr_size);
 }
 
