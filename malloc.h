@@ -9,6 +9,7 @@
 #include <string.h>
 #include "ANSI-color-codes.h"
 
+#define align(offset, align) ((offset + (align - 1)) & - align)
 #define ALIGNMENT sizeof(void *)
 #define MIN_SIZE sizeof(void *)
 #define PAGESIZE sysconf(_SC_PAGESIZE)
