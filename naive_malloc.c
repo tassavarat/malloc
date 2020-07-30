@@ -1,5 +1,13 @@
 #include "malloc.h"
 
+void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
+{
+	*excess_mem -= chunk_size;
+	/* printf("excess_mem: %lu\n", *excess_mem); */
+	*(size_t *)chunk = chunk_size;
+	*(size_t *)(chunk + *(size_t *)chunk) = *excess_mem;
+}
+
 void *find_unused(char *start_addr, size_t call_nb)
 {
 	while (call_nb > 0)
@@ -12,14 +20,14 @@ void *find_unused(char *start_addr, size_t call_nb)
 
 void *extend(size_t chunk_size, size_t *excess_mem)
 {
-	void *prev_brk;
+	void *chunk;
 
 	/* puts("sbrk called"); */
-	prev_brk = sbrk(align(chunk_size, sysconf(_SC_PAGESIZE)));
-	if (prev_brk == (void *) -1)
+	chunk = sbrk(align(chunk_size, sysconf(_SC_PAGESIZE)));
+	if (chunk == (void *) -1)
 		return (NULL);
 	*excess_mem += align(chunk_size, sysconf(_SC_PAGESIZE));
-	return (prev_brk);
+	return (chunk);
 }
 
 /**
@@ -30,7 +38,7 @@ void *extend(size_t chunk_size, size_t *excess_mem)
  */
 void *naive_malloc(size_t size)
 {
-	void *prev_brk;
+	void *chunk;
 	static void *start_addr;
 	static size_t call_nb;
 	size_t hdr_size, chunk_size, excess_mem;
@@ -43,22 +51,19 @@ void *naive_malloc(size_t size)
 	if (!start_addr)
 	{
 		excess_mem = 0;
-		start_addr = prev_brk = extend(chunk_size, &excess_mem);
-		if (!prev_brk)
+		start_addr = chunk = extend(chunk_size, &excess_mem);
+		if (!chunk)
 			return (NULL);
 	}
 	else
 	{
-		prev_brk = find_unused(start_addr, call_nb);
-		excess_mem = *(size_t *)prev_brk;
+		chunk = find_unused(start_addr, call_nb);
+		excess_mem = *(size_t *)chunk;
 		if (excess_mem < chunk_size + hdr_size)
 			if (!extend(chunk_size, &excess_mem))
 				return (NULL);
 	}
-	excess_mem -= chunk_size;
-	/* printf("excess_mem: %lu\n", excess_mem); */
-	*(size_t *)prev_brk = chunk_size;
-	*(size_t *)((char *)prev_brk + *(size_t *)prev_brk) = excess_mem;
+	set_hdr(chunk, chunk_size, &excess_mem);
 	++call_nb;
-	return ((char *)prev_brk + hdr_size);
+	return ((char *)chunk + hdr_size);
 }
