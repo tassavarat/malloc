@@ -15,19 +15,19 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 
 /**
  * find_unused - find unused chunk block
- * @start_addr: pointer to heap start
+ * @heap_start: pointer to heap start
  * @call_nb: specifies how many times malloc has been called
  *
  * Return: pointer to start of unused chunk
  */
-void *find_unused(char *start_addr, size_t call_nb)
+void *find_unused(char *heap_start, size_t call_nb)
 {
 	while (call_nb > 0)
 	{
-		start_addr += *(size_t *)start_addr;
+		heap_start += *(size_t *)heap_start;
 		--call_nb;
 	}
-	return (start_addr);
+	return (heap_start);
 }
 
 /**
@@ -49,7 +49,7 @@ void *extend(size_t chunk_size, size_t *excess_mem)
 }
 
 /**
- * naive_malloc - naive malloc: dynamically allocates memory on the heap
+ * naive_malloc - naive malloc: dynamically allocates memory to the heap
  * @size: number of bytes to allocate
  *
  * Return: the memory address newly allocated, or NULL on error
@@ -57,22 +57,22 @@ void *extend(size_t chunk_size, size_t *excess_mem)
 void *naive_malloc(size_t size)
 {
 	void *chunk;
-	static void *start_addr;
+	static void *heap_start;
 	static size_t call_nb;
 	size_t hdr_size, chunk_size, excess_mem;
 
 	hdr_size = sizeof(size_t);
 	chunk_size = align(size, sizeof(void *)) + hdr_size;
-	if (!start_addr)
+	if (!heap_start)
 	{
 		excess_mem = 0;
-		start_addr = chunk = extend(chunk_size, &excess_mem);
+		heap_start = chunk = extend(chunk_size, &excess_mem);
 		if (!chunk)
 			return (NULL);
 	}
 	else
 	{
-		chunk = find_unused(start_addr, call_nb);
+		chunk = find_unused(heap_start, call_nb);
 		excess_mem = *(size_t *)chunk;
 		if (excess_mem < chunk_size + hdr_size)
 			if (!extend(chunk_size, &excess_mem))
