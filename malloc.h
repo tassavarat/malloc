@@ -9,7 +9,7 @@
 #include <string.h>
 #include "ANSI-color-codes.h"
 
-#define align(offset, align) ((offset + (align - 1)) & - align)
+#define align(offset, align) ((offset + (align - 1)) & -align)
 #define ALIGNMENT sizeof(void *)
 #define MIN_SIZE sizeof(void *)
 #define PAGESIZE sysconf(_SC_PAGESIZE)
@@ -30,7 +30,7 @@
  * struct heap_info_s - stores info about heap
  * @heap_start: start of heap
  * @heap_end: end of heap
-*/
+ */
 typedef struct heap_info_s
 {
 	void *heap_start;
@@ -41,7 +41,7 @@ typedef struct heap_info_s
  * struct block_info_s - stores info block
  * @prev: prev
  * @size: size
-*/
+ */
 typedef struct block_info_s
 {
 	size_t prev;
