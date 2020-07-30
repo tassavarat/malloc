@@ -13,7 +13,7 @@ void set_hdr(char *chunk, size_t chunk_size, size_t *excess_mem)
 	*(size_t *)chunk = 0;
 	*(size_t *)(chunk + sizeof(size_t)) = chunk_size;
 	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = 0;
-	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t))) = *excess_mem;
+	*(size_t *)(chunk + *(size_t *)(chunk + sizeof(size_t)) + sizeof(size_t)) = *excess_mem;
 }
 
 /**
@@ -80,7 +80,8 @@ void *malloc(size_t size)
 	else
 	{
 		chunk = find_unused(heap_start, call_nb);
-		excess_mem = *(size_t *)chunk;
+		excess_mem = *(size_t *)((char *)chunk + sizeof(size_t));
+		/* printf("unused: excess_mem: %lu\n", excess_mem); */
 		if (excess_mem < chunk_size + hdr_size)
 			if (!extend(chunk_size, &excess_mem))
 				return (NULL);
@@ -109,7 +110,7 @@ int main(void)
 		printf("%p: %s, ", (void *)str, str);
 		chunk = (void *)(str - sizeof(size_t));
 		printf("chunk addr: %p, ", (void *)chunk);
-		printf("prev size: %lu, ", *((size_t *)((char *)chunk - sizeof(size_t))));
+		/* printf("prev size: %lu, ", *((size_t *)((char *)chunk - sizeof(size_t)))); */
 		printf("cur size: %lu, ", *((size_t *)chunk));
 		printf("break: %p\n", sbrk(0));
 	}
