@@ -1,5 +1,12 @@
 #include "malloc.h"
 
+/**
+ * find_unused - find unused chunk block
+ * @start_addr: start address (head of the heap)
+ * @call_nb: specifies how many times malloc has been called
+ *
+ * Return: pointer to start of unused chunk
+ */
 void *find_unused(char *start_addr, size_t call_nb)
 {
 	while (call_nb > 0)
@@ -10,6 +17,13 @@ void *find_unused(char *start_addr, size_t call_nb)
 	return (start_addr);
 }
 
+/**
+ * extend - calls sbrk with size aligned to page size
+ * @chunk_size: aligned size request
+ * @excess_mem: pointer to variable tracking excess memory
+ *
+ * Return: pointer to start of new chunk, NULL on failure
+ */
 void *extend(size_t chunk_size, size_t *excess_mem)
 {
 	void *prev_brk;
@@ -23,7 +37,8 @@ void *extend(size_t chunk_size, size_t *excess_mem)
 }
 
 /**
- * malloc - naive version of malloc: dynamically allocates memory on the heap
+ * naive_malloc - naive version of malloc: dynamically allocates
+ * memory on the heap
  * @size: number of bytes to allocate
  *
  * Return: the memory address newly allocated, or NULL on error
@@ -37,9 +52,6 @@ void *naive_malloc(size_t size)
 
 	hdr_size = sizeof(size_t);
 	chunk_size = align(size, sizeof(void *)) + hdr_size;
-	/* printf("call_nb: %lu\n", call_nb); */
-	/* printf("chunk_size: %lu\n", chunk_size); */
-	/* printf("sbrk req: %lu\n", align(chunk_size, sysconf(_SC_PAGESIZE))); */
 	if (!start_addr)
 	{
 		excess_mem = 0;

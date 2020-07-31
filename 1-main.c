@@ -7,44 +7,43 @@
 
 void *_malloc(size_t size);
 
-#define LOWER 1
-#define UPPER 1000000000000
+#define LOWER 16
+#define UPPER 16
 #define ITERATIONS 100
+#define SIZE 100
 
-/**
- * main - Program entry point
- *
- * Return: EXIT_SUCCESS or EXIT_FAILURE
- */
-int main(void)
+
+int main(int argc, char *argv[])
 {
-	char *str;
-	int i;
-	size_t s;
+	FILE *f;
+	size_t arr[SIZE] = {16,24, 16}, i, t = 0;
+	char *addr[SIZE];
 
-	setbuf(stdout, NULL);
-	printf("Starting break is %p\n", sbrk(0));
-	srand(time(0));
+	(void) argv;
+	if (argc < 2)
+		return (1);
+	f = fopen(argv[argc - 1], "r");
+	for (i = 0; i < SIZE; ++i) {
+		fscanf(f, "%lu\n", &arr[i]);
+	}
 	for (i = 0; i < ITERATIONS; i++)
 	{
 		/* void *chunk; */
-
-		s = LOWER + (rand() % (UPPER - LOWER + 1));
-		printf("%lu\n", s);
-		str = _malloc(s);
-		strcpy(str, "Holberton");
-		str[21] = '\0';
-		/* printf("%p: %s, ", (void *)str, str); */
+		t += arr[i];
+		addr[i] = _malloc(arr[i]);
+		/* strcpy(str, "Holberton"); */
+		/* str[21] = '\0'; */
+		printf("Iteration: %lu %p", i,(void *)addr[i]);
 		/* chunk = (void *)(str - sizeof(size_t)); */
 		/* printf("chunk addr: %p, ", (void *)chunk); */
 		/* printf("size: %lu, ", *((size_t *)chunk)); */
-		/* printf("break: %p\n", sbrk(0)); */
+		printf("  break: %p\n", sbrk(0));
 	}
-
-	printf("Final break is %p\n", sbrk(0));
-	print_heap();
-	return (EXIT_SUCCESS);
+	/* print_heap(); */
+	printf("Total %lu\n", t);
+	return 0;
 }
+
 
 /**
  * main - Program entry point
@@ -55,24 +54,28 @@ int main(void)
 /* { */
 /* 	char *str; */
 /* 	int i; */
+/* 	size_t s; */
 
 /* 	setbuf(stdout, NULL); */
 /* 	printf("Starting break is %p\n", sbrk(0)); */
-
-/* 	for (i = 0; i < 10; i++) */
+/* 	srand(time(0)); */
+/* 	for (i = 0; i < ITERATIONS; i++) */
 /* 	{ */
-/* 		void *chunk; */
+/* 		/\* void *chunk; *\/ */
 
-/* 		str = naive_malloc_page(1016); */
+/* 		s = LOWER + (rand() % (UPPER - LOWER + 1)); */
+/* 		printf("%lu\n", s); */
+/* 		str = _malloc(s); */
 /* 		strcpy(str, "Holberton"); */
 /* 		str[21] = '\0'; */
-/* 		printf("%p: %s, ", (void *)str, str); */
-/* 		chunk = (void *)(str - sizeof(size_t)); */
-/* 		printf("chunk addr: %p, ", (void *)chunk); */
-/* 		printf("size: %lu, ", *((size_t *)chunk)); */
-/* 		printf("break: %p\n", sbrk(0)); */
+/* 		/\* printf("%p: %s, ", (void *)str, str); *\/ */
+/* 		/\* chunk = (void *)(str - sizeof(size_t)); *\/ */
+/* 		/\* printf("chunk addr: %p, ", (void *)chunk); *\/ */
+/* 		/\* printf("size: %lu, ", *((size_t *)chunk)); *\/ */
+/* 		/\* printf("break: %p\n", sbrk(0)); *\/ */
 /* 	} */
 
 /* 	printf("Final break is %p\n", sbrk(0)); */
+/* 	print_heap(); */
 /* 	return (EXIT_SUCCESS); */
 /* } */
