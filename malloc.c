@@ -90,6 +90,7 @@ void *expand(size_t size)
 		p -= HEADER_SIZE;
 		tmp = p;
 		/* Change previous sentinel chunk, returned to USER */
+		/* FIXME: cause GET_PREV is not 0, size is size+1*/
 		add_header(p, size, GET_PREV(p));
 		p += GET_SIZE(p);
 		add_header(p, page_size - size - 2 * HEADER_SIZE, 0);
@@ -132,6 +133,7 @@ void *find_block(size_t size)
 			{
 				/* Don't split the chunk */
 				((block_info *)p)->size &= LSB_ZERO_MASK;
+				((block_info *)p)->prev = 0;
 			}
 
 			return (tmp);
@@ -151,7 +153,6 @@ void *_malloc(size_t size)
 	char *p;
 
 	size = align_up(size, ALIGNMENT);
-
 	if (size == 0)
 		return (NULL);
 	p = find_block(size);
