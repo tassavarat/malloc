@@ -11,6 +11,7 @@ void *_realloc(void *ptr, size_t size)
 	char *s, *a;
 	size_t i, limit, old_size;
 
+	size = align_up(size, ALIGNMENT);
 	old_size = ptr ? GET_SIZE((char *)ptr - HEADER_SIZE) : 0;
 	if (old_size == size)
 		return (ptr);

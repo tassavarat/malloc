@@ -7,8 +7,8 @@
 
 void *_malloc(size_t size);
 
-#define LOWER 16
-#define UPPER 16
+#define LOWER 0
+#define UPPER 99
 #define ITERATIONS 100
 #define SIZE 100
 
@@ -16,10 +16,9 @@ void *_malloc(size_t size);
 int main(int argc, char *argv[])
 {
 	FILE *f;
-	size_t arr[SIZE] = {16,24, 16}, i, t = 0;
+	size_t arr[SIZE] = {16,24, 16}, i, s;
 	char *addr[SIZE];
 
-	(void) argv;
 	if (argc < 2)
 		return (1);
 	f = fopen(argv[argc - 1], "r");
@@ -29,7 +28,6 @@ int main(int argc, char *argv[])
 	for (i = 0; i < ITERATIONS; i++)
 	{
 		/* void *chunk; */
-		t += arr[i];
 		addr[i] = _malloc(arr[i]);
 		/* strcpy(str, "Holberton"); */
 		/* str[21] = '\0'; */
@@ -39,8 +37,21 @@ int main(int argc, char *argv[])
 		/* printf("size: %lu, ", *((size_t *)chunk)); */
 		printf("  break: %p\n", sbrk(0));
 	}
-	/* print_heap(); */
-	printf("Total %lu\n", t);
+
+	for (i = 0; i < 40; i++)
+	{
+		/* void *chunk; */
+		s = LOWER + (rand() % (UPPER - LOWER + 1));
+		_free(addr[s]);
+		/* strcpy(str, "Holberton"); */
+		/* str[21] = '\0'; */
+		printf("Iteration: %lu %p", i,(void *)addr[i]);
+		/* chunk = (void *)(str - sizeof(size_t)); */
+		/* printf("chunk addr: %p, ", (void *)chunk); */
+		/* printf("size: %lu, ", *((size_t *)chunk)); */
+		printf("  break: %p\n", sbrk(0));
+	}
+	print_heap();
 	return 0;
 }
 
