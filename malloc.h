@@ -13,7 +13,7 @@
 #define ALIGNMENT sizeof(void *)
 #define MIN_SIZE sizeof(void *)
 #define PAGESIZE sysconf(_SC_PAGESIZE)
-#define HEADER_SIZE sizeof(block_info)
+#define HDR_SZ sizeof(block_info)
 #define align_up(num, align) (((num) + ((align) - 1)) & ~((align) - 1))
 
 /* Macros to get struct members */

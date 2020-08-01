@@ -11,7 +11,7 @@ void _free(void *ptr)
 	if (!ptr)
 		return;
 	p = ptr;
-	p -= HEADER_SIZE;
+	p -= HDR_SZ;
 	next = p + GET_SIZE(p);
 	((block_info *)next)->prev = GET_SIZE(p);
 	((block_info *)next)->size |= 1;

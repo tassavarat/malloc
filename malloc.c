@@ -4,7 +4,7 @@ static heap_info heap;
 
 /**
  * print_heap - prints contents of heap, used for visualization
-*/
+ */
 void print_heap(void)
 {
 	char *p = heap.heap_start;
@@ -12,41 +12,27 @@ void print_heap(void)
 
 	if (!p)
 		return;
-	while (GET_SIZE(p) >= HEADER_SIZE + MIN_SIZE)
+	while (GET_SIZE(p) >= HDR_SZ + MIN_SIZE)
 	{
-		printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
-		printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, GET_PREV(p),
-		       RED, _GET_SIZE(p), reset);
 		p += GET_SIZE(p);
 		++i;
 	}
-	printf("%sChunk # %lu, %sAddr: %p\n%s", MAG, i, BLU, (void *)p, reset);
-	printf("\t%sPREV: %lu, %sSIZE: %lu%s\n", GRN, _GET_PREV(p),
-	       RED, _GET_SIZE(p), reset);
-
-	if (p + HEADER_SIZE != sbrk(0))
-	{
-		printf("%s\t\tChunk end and Heap end do not match!!!%s\n", BRED, reset);
+	if (p + HDR_SZ != sbrk(0))
 		exit(1);
-	}
-	else
-	{
-		printf("%s\t\tChunk end is good!!!%s\n", BGRN, reset);
-	}
 }
 
 /**
  * add_header - add header info
  * @addr: header address
- * @size: size of this memory block, size + HEADER_SIZE
+ * @size: size of this memory block, size + HDR_SZ
  * @prev: previous chunk offset, 0 if previous is allocated
-*/
+ */
 void add_header(void *addr, size_t size, size_t prev)
 {
 	block_info *block;
 
 	block = addr;
-	block->size = prev ? size + HEADER_SIZE + 1 : size + HEADER_SIZE;
+	block->size = prev ? size + HDR_SZ + 1 : size + HDR_SZ;
 	block->prev = prev;
 }
 
@@ -54,16 +40,16 @@ void add_header(void *addr, size_t size, size_t prev)
  * expand - expand heap by calling sbrk()
  * @size: size needed by user
  * Return: pointer to memory block header
-*/
+ */
 void *expand(size_t size)
 {
-	size_t page_size;
+	size_t pg_sz;
 	char *p, *tmp;
 
-	page_size = 2 * HEADER_SIZE + MIN_SIZE + size;
-	page_size += heap.heap_start ? 0 : HEADER_SIZE;
-	page_size = align_up(page_size, PAGESIZE);
-	p = sbrk(page_size);
+	pg_sz = 2 * HDR_SZ + MIN_SIZE + size;
+	pg_sz += heap.heap_start ? 0 : HDR_SZ;
+	pg_sz = align_up(pg_sz, PAGESIZE);
+	p = sbrk(pg_sz);
 	if (p == (void *)-1 && errno == ENOMEM)
 		return (NULL);
 	if (heap.heap_start == NULL)
@@ -73,10 +59,8 @@ void *expand(size_t size)
 		/* Set the first chunk, returned to USER */
 		add_header(p, size, 0);
 		/* Set middle and sentinel chunks */
-		add_header(p + size + HEADER_SIZE,
-			   page_size - size - 3 * HEADER_SIZE, 0);
-		add_header(p + page_size - HEADER_SIZE, 0,
-			   page_size - size - 2 * HEADER_SIZE);
+		add_header(p + size + HDR_SZ, pg_sz - size - 3 * HDR_SZ, 0);
+		add_header(p + pg_sz - HDR_SZ, 0, pg_sz - size - 2 * HDR_SZ);
 		return (p);
 	}
 	else
@@ -87,14 +71,14 @@ void *expand(size_t size)
 		 * that sentinel to regular chunk, which will be returned to
 		 * a user
 		 */
-		p -= HEADER_SIZE;
+		p -= HDR_SZ;
 		tmp = p;
 		/* Change previous sentinel chunk, returned to USER */
 		/* FIXME: cause GET_PREV is not 0, size is size+1*/
 		add_header(p, size, GET_PREV(p));
 		p += GET_SIZE(p);
-		add_header(p, page_size - size - 2 * HEADER_SIZE, 0);
-		add_header(p + GET_SIZE(p), 0, page_size - size - HEADER_SIZE);
+		add_header(p, pg_sz - size - 2 * HDR_SZ, 0);
+		add_header(p + GET_SIZE(p), 0, pg_sz - size - HDR_SZ);
 		return (tmp);
 	}
 }
@@ -103,31 +87,27 @@ void *expand(size_t size)
  * find_block - find an unused memory block to return to a user
  * @size: size needed by a user
  * Return: pointer to a memory block header
-*/
+ */
 void *find_block(size_t size)
 {
 	char *p = heap.heap_start, *tmp;
-	size_t required_size = size + HEADER_SIZE;
+	size_t req_sz = size + HDR_SZ;
 
 	if (!p)
 		return (NULL);
 
-	while (GET_SIZE(p) >= HEADER_SIZE + MIN_SIZE)
+	while (GET_SIZE(p) >= HDR_SZ + MIN_SIZE)
 	{
 		p += GET_SIZE(p);
-		if ((_GET_SIZE(p) & 1) && GET_SIZE(p - GET_PREV(p)) >= required_size)
+		if ((_GET_SIZE(p) & 1) && GET_SIZE(p - GET_PREV(p)) >= req_sz)
 		{
 			tmp = p - GET_PREV(p);
-			if (GET_SIZE(tmp) >= required_size + HEADER_SIZE + MIN_SIZE)
+			if (GET_SIZE(tmp) >= req_sz + HDR_SZ + MIN_SIZE)
 			{
 				/* Split the chunk */
-				/* middle = tmp + required_size; */
-				/* ((block_info *)middle)->size = GET_SIZE(tmp) - required_size; */
-				/* ((block_info *)middle)->prev = 0; */
-				add_header(tmp + required_size,
-					   GET_SIZE(tmp) - required_size - HEADER_SIZE, 0);
-				((block_info *)tmp)->size = required_size;
-				((block_info *)p)->prev = GET_SIZE(tmp + required_size);
+				add_header(tmp + req_sz, GET_SIZE(tmp) - req_sz - HDR_SZ, 0);
+				((block_info *)tmp)->size = req_sz;
+				((block_info *)p)->prev = GET_SIZE(tmp + req_sz);
 			}
 			else
 			{
@@ -160,5 +140,5 @@ void *_malloc(size_t size)
 		p = expand(size);
 	if (!p)
 		return (NULL);
-	return (p + HEADER_SIZE);
+	return (p + HDR_SZ);
 }
