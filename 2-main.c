@@ -37,6 +37,7 @@ int main(void)
 		printf("chunk addr: %p, ", (void *)chunk);
 		printf("size: %lu, ", *((size_t *)chunk));
 		_free(str);
+		/* _free(str); */
 		printf("break: %p\n", sbrk(0));
 	}
 

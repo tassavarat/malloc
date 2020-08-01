@@ -59,7 +59,7 @@ void *expand(size_t size)
 		/* Set the first chunk, returned to USER */
 		add_header(p, size, 0);
 		/* Set middle and sentinel chunks */
-		add_header(p + size + HDR_SZ, pg_sz - size - 3 * HDR_SZ, 0);
+		add_header(p + GET_SIZE(p), pg_sz - size - 3 * HDR_SZ, 0);
 		add_header(p + pg_sz - HDR_SZ, 0, pg_sz - size - 2 * HDR_SZ);
 		return (p);
 	}

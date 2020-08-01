@@ -13,6 +13,8 @@ void _free(void *ptr)
 	p = ptr;
 	p -= HDR_SZ;
 	next = p + GET_SIZE(p);
+	if (_GET_SIZE(next) & 1)
+		return;
 	((block_info *)next)->prev = GET_SIZE(p);
 	((block_info *)next)->size |= 1;
 }
