@@ -1,13 +1,14 @@
 #ifndef MALLOC_H
 #define MALLOC_H
 
+#include "ANSI-color-codes.h"
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include "ANSI-color-codes.h"
 
 #define align(offset, align) ((offset + (align - 1)) & -align)
 #define ALIGNMENT sizeof(void *)

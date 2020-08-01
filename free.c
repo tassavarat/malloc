@@ -14,7 +14,7 @@ void _free(void *ptr)
 	p -= HDR_SZ;
 	next = p + GET_SIZE(p);
 	if (_GET_SIZE(next) & 1)
-		exit(134);
+		kill(getpid(), SIGABRT);
 	((block_info *)next)->prev = GET_SIZE(p);
 	((block_info *)next)->size |= 1;
 }
