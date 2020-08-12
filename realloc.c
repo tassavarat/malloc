@@ -12,7 +12,7 @@ void *_realloc(void *ptr, size_t size)
 	size_t i, limit, old_size;
 
 	size = align_up(size, ALIGNMENT);
-	old_size = ptr ? GET_SIZE((char *)ptr - HDR_SZ) : 0;
+	old_size = ptr ? GET_SIZE((char *)ptr - HDR_SZ) - HDR_SZ : 0;
 	if (old_size == size)
 		return (ptr);
 	if (ptr != NULL && size == 0)
