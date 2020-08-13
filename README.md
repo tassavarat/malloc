@@ -3,9 +3,9 @@
 
 
 * Table of Contents
-- [Description][[#description]
-  - [[Data Structures][#Data structures]]
-- [Authors][#authors]
+- [Description](#description)
+  - [[Data Structures](#Data structures])
+- [Authors](#authors)
 
 # Description
 ## Data structures
