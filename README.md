@@ -2,7 +2,7 @@
 ### `malloc`, `free`, `realloc` functions implementation using C
 
 
-* Table of Contents
+### Table of Contents
 - [Description](#description)
   - [Data Structures](#Data)
 - [Authors](#authors)
