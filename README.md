@@ -4,7 +4,7 @@
 
 * Table of Contents
 - [Description](#description)
-  - [Data Structures](#Data structures)
+  - [Data Structures](#Data)
 - [Authors](#authors)
 
 # Description
